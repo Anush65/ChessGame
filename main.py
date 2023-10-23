@@ -3,10 +3,8 @@
 
 
 #Part one: Set up variables, images and game loop
-import chess
-
 import pygame
-pygame.init()
+pygame.init() 
 num = 8 #Size of the board
 width = 600
 height = 600
