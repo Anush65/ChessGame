@@ -16,15 +16,14 @@ big_font = pygame.font.Font('freesansbold.ttf', 47)
 timer = pygame.time.Clock()
 fps = 50 #To just determine how smooth your game goes
 #game variables and images here
-white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+white_pieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-white_locations =  [(0,0), (1,0), (2, 0), (3,0), (4, 0), (5, 0), (6, 0), (7,0),
-                    (0,1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)] #(column, row)
-black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+white_locations =  [(0,7), (1,7), (2, 7), (3,7), (4, 7), (5, 7), (6, 7), (7,7),
+                    (0,6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)] #(column, row)
+black_pieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-black_locations =  [(0,7), (1,7), (2, 7), (3,7), (4, 7), (5, 7), (6, 7), (7,7),
-                    (0,6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
-
+black_locations =  [(0,0), (1,0), (2, 0), (3,0), (4, 0), (5, 0), (6, 0), (7,0),
+                    (0,1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
 captured_pieces_white = [] #To keep track of what pieces are captured
 captured_pieces_black = []
 
@@ -77,11 +76,11 @@ def draw_board():
     for i in range(0, num - 1, 2):
         for j in range(0, num - 1, 2):
             rect = pygame.Rect(i*size, j*size, size, size)
-            pygame.draw.rect(screen, '#f1e0ab', rect)
+            pygame.draw.rect(screen, '#edd6b0', rect)
     for i in range(1, num, 2):
         for j in range(1, num, 2):
             rect = pygame.Rect(i*size, j*size, size, size)
-            pygame.draw.rect(screen, '#f1e0ab', rect)
+            pygame.draw.rect(screen, '#edd6b0', rect)
     pygame.draw.rect(screen, 'light gray', [0, 600, width, 600//8])
     pygame.draw.rect(screen, 'gold', [0, 600, width, 600//8], 5)
     pygame.draw.rect(screen, 'light gray', [600, 0, 200, height])
@@ -96,28 +95,49 @@ def draw_board():
 
 #draw pieces onto the board
 def draw_pieces(): #btw draw_pieces needs to be after draw_board function since pieces are going to be on top of the board
+    
     for i in range(len(white_pieces)):
         index = piece_list.index(white_pieces[i])
         if white_pieces[i] == 'pawn':
-            screen.blit(white_pawn, (white_locations[i][0] * 600//8 + 10, white_locations[i][1] * 600//8 + 10))
-
+            screen.blit(white_pawn, (white_locations[i][0] * 600//8 + 8, white_locations[i][1] * 600//8 + 10))
         else:
             screen.blit(white_images[index], (white_locations[i][0] * 600//8 + 10, white_locations[i][1] * 600//8 + 10))
         if turn_step < 2:
             if selection == i:
-                pygame.draw.rect(screen, 'red', [white_locations[i][0] * 600//8 + 1, white_locations[i][1] * 600//8 + 1,
-                                                 600//8, 600//8], 2)
-
+                pygame.draw.rect(screen, '#f6eb72', [white_locations[i][0] * 600//8 + 1, white_locations[i][1] * 600//8 + 1,600//8, 600//8], 5)
     for i in range(len(black_pieces)):
         index = piece_list.index(black_pieces[i])
         if black_pieces[i] == 'pawn':
-            screen.blit(black_pawn, (black_locations[i][0] * 600//8 + 10, black_locations[i][1] * 600//8 + 10))
+            screen.blit(black_pawn, (black_locations[i][0] * 600//8 + 8, black_locations[i][1] * 600//8 + 10))
         else:
             screen.blit(black_images[index], (black_locations[i][0] * 600//8 + 10, black_locations[i][1] * 600//8 + 10))
         if turn_step >= 2:
             if selection == i:
-                pygame.draw.rect(screen, 'blue', [black_locations[i][0] * 600//8 + 1, black_locations[i][1] * 600//8 + 1,
-                                                  600//8, 600//8], 2)
+                pygame.draw.rect(screen, '#f6eb72', [black_locations[i][0] * 600//8 + 1, black_locations[i][1] * 600//8 + 1,600//8, 600//8], 5)
+
+def flip_pieces():
+    #flip white
+    for i in range(len(white_locations)):
+        x = white_locations[i][0]; y = white_locations[i][1]
+        white_locations[i] = (7 - x, 7 - y)
+    #flip black
+    for i in range(len(black_locations)):
+        x = black_locations[i][0]; y = black_locations[i][1]
+        black_locations[i] = (7 - x, 7 - y)
+
+def incheck(whitepieces, blackpieces, whiteloc, blackloc, turn):
+    if turn == 'white':
+        options = check_options(blackpieces, blackloc, 'black')
+        for piece in options:
+            if whiteloc[whitepieces.index('king')] in piece: 
+                return True
+    if turn == 'black':
+        options = check_options(whitepieces, whiteloc, 'white')
+        for piece in options:
+            if blackloc[blackpieces.index('king')] in piece: 
+                return True
+    return False
+
 
 #function to check all valid options for the piece to move
 def check_options(pieces, locations, turn):
@@ -146,28 +166,59 @@ def check_options(pieces, locations, turn):
 #1.Pawn moves
 def check_pawn(position, color):
     moves_list = []
-    if color == 'white':
-        if (position[0], position[1] + 1) not in white_locations and (position[0], position[1] + 1) not in black_locations \
-            and position[1] < 7: #last condition to check if the piece on last square
-            moves_list.append((position[0], position[1] + 1))
-        if (position[0], position[1] + 2) not in white_locations and (position[0], position[1] + 2) not in black_locations \
-            and position[1] == 1: #last condition to check if the pawn in initial position
-            moves_list.append((position[0], position[1] + 2))
-        if (position[0] + 1, position[1] + 1) in black_locations:
-            moves_list.append((position[0] + 1, position[1] + 1))
-        if (position[0] - 1, position[1] + 1) in black_locations:
-            moves_list.append((position[0] - 1, position[1] + 1))
-    else:
-        if (position[0], position[1] - 1) not in white_locations and (position[0], position[1] - 1) not in black_locations \
-                    and position[1] > 0 :  # last condition to check if the piece on last square
+
+    #white bottom
+    if turn_step < 2:
+        if color == 'white':
+            if (position[0], position[1] - 1) not in white_locations and (position[0], position[1] - 1) not in black_locations \
+                and position[1] > 0: #last condition to check if the piece on last square
                 moves_list.append((position[0], position[1] - 1))
-        if (position[0], position[1] - 2) not in white_locations and (position[0], position[1] - 2) not in black_locations \
-                    and position[1] == 6:  # last condition to check if the pawn in initial position
+            if (position[0], position[1] - 2) not in white_locations and (position[0], position[1] - 2) not in black_locations \
+                and position[1] == 6: #last condition to check if the pawn in initial position
                 moves_list.append((position[0], position[1] - 2))
-        if (position[0] + 1, position[1] - 1) in white_locations:
+            if (position[0] + 1, position[1] - 1) in black_locations:
                 moves_list.append((position[0] + 1, position[1] - 1))
-        if (position[0] - 1, position[1] - 1) in white_locations:
+            if (position[0] - 1, position[1] - 1) in black_locations:
                 moves_list.append((position[0] - 1, position[1] - 1))
+        else:
+            if (position[0], position[1] + 1) not in white_locations and (position[0], position[1] + 1) not in black_locations \
+                        and position[1] < 7 :  # last condition to check if the piece on last square
+                    moves_list.append((position[0], position[1] + 1))
+            if (position[0], position[1] + 2) not in white_locations and (position[0], position[1] + 2) not in black_locations \
+                        and position[1] == 1:  # last condition to check if the pawn in initial position
+                    moves_list.append((position[0], position[1] + 2))
+            if (position[0] + 1, position[1] + 1) in white_locations:
+                    moves_list.append((position[0] + 1, position[1] + 1))
+            if (position[0] - 1, position[1] + 1) in white_locations:
+                    moves_list.append((position[0] - 1, position[1] + 1))
+
+    #black bottom
+    else:
+        if color == 'white':
+            if (position[0], position[1] + 1) not in white_locations and (position[0], position[1] + 1) not in black_locations \
+                and position[1] < 7: #last condition to check if the piece on last square
+                moves_list.append((position[0], position[1] + 1))
+            if (position[0], position[1] + 2) not in white_locations and (position[0], position[1] + 2) not in black_locations \
+                and position[1] == 1: #last condition to check if the pawn in initial position
+                moves_list.append((position[0], position[1] + 2))
+            if (position[0] + 1, position[1] + 1) in black_locations:
+                moves_list.append((position[0] + 1, position[1] + 1))
+            if (position[0] - 1, position[1] + 1) in black_locations:
+                moves_list.append((position[0] - 1, position[1] + 1))
+        else:
+            if (position[0], position[1] - 1) not in white_locations and (position[0], position[1] - 1) not in black_locations \
+                        and position[1] > 0 :  # last condition to check if the piece on last square
+                    moves_list.append((position[0], position[1] - 1))
+            if (position[0], position[1] - 2) not in white_locations and (position[0], position[1] - 2) not in black_locations \
+                        and position[1] == 6:  # last condition to check if the pawn in initial position
+                    moves_list.append((position[0], position[1] - 2))
+            if (position[0] + 1, position[1] - 1) in white_locations:
+                    moves_list.append((position[0] + 1, position[1] - 1))
+            if (position[0] - 1, position[1] - 1) in white_locations:
+                    moves_list.append((position[0] - 1, position[1] - 1))
+    
+        
+
     return moves_list
 
 def check_rook(position, color):
@@ -284,21 +335,44 @@ def check_king(position, color):
         if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
             moves_list.append(target)
     return moves_list
+
 def check_valid_moves():
-    if turn_step < 2:
+    if turn_step < 2: #and turn_step == 1
         options_list = white_options
+        #checking next move (doesn't work)
+        '''tmp_black_pieces = black_pieces[::]
+        tmp_white_pieces = white_pieces[::]
+        tmp_white_locations = white_locations[::]
+        tmp_black_locations = black_locations[::]
+        #simulate every move
+        for i in options_list[selection]:
+            print(selection)
+            tmp_white_locations[selection] = i
+            if i in tmp_black_locations: #piece captured
+                black_piece = tmp_black_locations.index(i)
+                tmp_black_pieces.pop(black_piece)
+                tmp_black_locations.pop(black_piece)
+            if incheck(tmp_white_pieces, tmp_black_pieces, tmp_white_locations, tmp_black_locations, 'black'): 
+                print("OH NO")
+                options_list[selection].remove(i)'''
     else:
         options_list = black_options
+        turn = 'white'
+    
     valid_options = options_list[selection]
     return valid_options
 
 def draw_valid(moves):
-    if turn_step < 2:
-        color = 'red'
-    else:
-        color = 'blue'
     for i in range(len(moves)):
-        pygame.draw.circle(screen, color, (moves[i][0] * (600//8) + 40, moves[i][1] * (600//8) + 40),5)
+        if moves[i] in white_locations or moves[i] in black_locations:
+            color = 'red'
+            pygame.draw.rect(screen, 'red', [moves[i][0] * 600//8 + 1, moves[i][1] * 600//8 + 1, 600//8, 600//8], 5)
+        else: 
+            if (moves[i][0] + moves[i][1]) % 2 == 0: 
+                color = '#d5c09e' #light squares
+            else: 
+                color = '#a57958' #dark squares
+            pygame.draw.circle(screen, color, (moves[i][0] * (600//8) + 40, moves[i][1] * (600//8) + 40),12)
 
 #to show captured pieces on the side
 #this is not working pls check the coordination
@@ -317,7 +391,7 @@ white_options = check_options(white_pieces, white_locations, 'white')
 run = True
 while run:
     timer.tick(fps)
-    screen.fill('#b38a0d') #whatever color you want the screen's background to be and the dark squared
+    screen.fill('#b88762') #whatever color you want the screen's background to be and the dark squared
     draw_board()
     draw_pieces()
     if selection != 1000:
@@ -334,24 +408,28 @@ while run:
         if turn_step < 2:
             if click_coords in white_locations:
                 selection = white_locations.index(click_coords)
+                valid_moves = check_valid_moves()
                 if turn_step == 0:
                     turn_step = 1 #We're making turn_step = 1 to make the move
             if click_coords in valid_moves and selection != 1000:
                 white_locations[selection] = click_coords
-                if click_coords in black_locations:
+                turn_step = 2
+                if click_coords in black_locations: #piece captured
                     black_piece = black_locations.index(click_coords)
                     captured_pieces_white.append(black_pieces[black_piece])
                     #Now we are removing the piece from the board as well as the list
                     black_pieces.pop(black_piece)
                     black_locations.pop(black_piece)
-                    #Now we are going to check for black and white pieces' options for next move
+                #empty selection to avoid auto select
+                selection = 1000
+                click_coords = None
+                flip_pieces()
+                #Now we are going to check for black and white pieces' options for next move
                 black_options = check_options(black_pieces,black_locations, 'black')
                 white_options = check_options(white_pieces, white_locations, 'white')
                 #Now we are going to let black play
-                turn_step = 2
-                pygame.transform.flip(screen, 100, 100)
-                selection = 1000
                 valid_moves = [] #Because now valid moves are going to be different
+
         if turn_step >= 2:
             if click_coords in black_locations:
                 selection = black_locations.index(click_coords)
@@ -359,19 +437,21 @@ while run:
                     turn_step = 3 #We're making turn_step = 1 to make the move
             if click_coords in valid_moves and selection != 1000:
                 black_locations[selection] = click_coords
-                if click_coords in white_locations:
+                turn_step = 0
+                if click_coords in white_locations: #piece captured
                     white_piece = white_locations.index(click_coords)
                     captured_pieces_black.append(white_pieces[white_piece])
                     #Now we are removing the piece from the board as well as the list
                     white_pieces.pop(white_piece)
                     white_locations.pop(white_piece)
-                    #Now we are going to check for black and white pieces' options for next move
+                #empty selection to avoid autoselect
+                selection = 1000
+                click_coords = None
+                flip_pieces()
+                #Now we are going to check for black and white pieces' options for next move
                 black_options = check_options(black_pieces,black_locations, 'black')
                 white_options = check_options(white_pieces, white_locations, 'white')
                 #Now we are going to let white play
-                turn_step = 0
-                pygame.transform.flip(screen, 100, 100)
-                selection = 1000
                 valid_moves = [] #Because now valid moves are going to be different
     pygame.display.flip() #throws everything onto the screen
 
