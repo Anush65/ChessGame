@@ -303,14 +303,14 @@ def draw_valid(moves):
 #to show captured pieces on the side
 #this is not working pls check the coordination
 def draw_captured():
-    """for i in range(len(captured_pieces_white)):
+    for i in range(len(captured_pieces_white)):
         captured_piece = captured_pieces_white[i]
         index = piece_list.index(captured_piece)
         screen.blit(small_black_images[index], (625, 5 + 10 * i))
     for i in range(len(captured_pieces_black)):
         captured_piece = captured_pieces_black[i]
         index = piece_list.index(captured_piece)
-        screen.blit(small_white_images[index], (725, 5 + 10 * i))"""
+        screen.blit(small_white_images[index], (725, 5 + 10 * i))
 #main game loop
 black_options = check_options(black_pieces,black_locations, 'black')
 white_options = check_options(white_pieces, white_locations, 'white')
