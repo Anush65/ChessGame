@@ -5,6 +5,9 @@
 
 #Part one: Set up variables, images and game loop
 import pygame
+
+usernames = [input("Black: "), input("White: ")]
+
 pygame.init() 
 num = 8 #Size of the board
 width = 600
@@ -88,6 +91,7 @@ counter = 0
 winner = ''
 game_over = False
 
+
 #draw main gameboard
 def draw_board():
     #please decipher what logic
@@ -115,6 +119,17 @@ def draw_board():
     status_text = ['White: Select a piece to move!', "White: Select destination",
                    'Black: Select a piece to move!', "Black: Select destination"]
     screen.blit(font.render(status_text[turn_step], True, 'black'), (120 + transposx, 620 + transposy))
+
+    if maximized:
+        if turn_step < 2:
+            black = 0
+            white = 1
+        else: 
+            white = 0
+            black = 1
+        screen.blit(font.render(usernames[black], True, 'yellow'), (size * (-2) + transposx, 30 + transposy))
+        screen.blit(font.render(usernames[white], True, 'yellow'), (size * (-2) + transposx, size * 7 + 30 + transposy))
+
     for i in range(9):
         pygame.draw.line(screen, 'black', (0 + transposx, 600//8 * i + transposy), (600 + transposx, (600//8) * i + transposy), 2)
         pygame.draw.line(screen, 'black', ((600//8) * i + transposx, 0 + transposy), ((600//8) * i + transposx, 600 + transposy), 2)
@@ -530,11 +545,15 @@ while run:
     info = pygame.display.Info()
     window_size = pygame.display.get_window_size()
 
+    maximized = False
+
     if window_size == (1536, 801): #checks maximized
         transposx, transposy = 450, 100
+        maximized = True
     else:
         transposx, transposy = 0, 0
-    screen.fill('#b88762') #whatever color you want the screen's background to be and the dark squared
+        maximized = False
+    screen.fill('black') #whatever color you want the screen's background to be and the dark squared
     draw_board()
     if old != None and new != None:
         draw_prev(old, new)
