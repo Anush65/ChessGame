@@ -118,7 +118,7 @@ def draw_board():
     for i in range(9):
         pygame.draw.line(screen, 'black', (0 + transposx, 600//8 * i + transposy), (600 + transposx, (600//8) * i + transposy), 2)
         pygame.draw.line(screen, 'black', ((600//8) * i + transposx, 0 + transposy), ((600//8) * i + transposx, 600 + transposy), 2)
-    screen.blit(font.render('Resign', True, 'orange'), (660 + transposx, 620 + transposy))
+    screen.blit(font.render('Resign', True, 'black'), (660 + transposx, 620 + transposy))
 
 #draw pieces onto the board
 def draw_pieces(white_pieces, black_pieces, white_locations, black_locations): #btw draw_pieces needs to be after draw_board function since pieces are going to be on top of the board
@@ -674,10 +674,14 @@ while run:
                 winner = ''
                 white_pieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook',
                                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+                white_pieces2 = ['leftrook', 'leftknight', 'leftbishop', 'queen', 'king', 'rightbishop', 'rightknight', 'rightrook',
+                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
                 black_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
                                    (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]  # (column, row)
                 black_pieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook',
                                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+                black_pieces2 = ['rightrook', 'rightknight', 'rightbishop', 'queen', 'king', 'leftbishop', 'leftknight', 'leftrook',
+                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
                 white_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
                                    (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
                 white_moved = [False, False, False, False, False, False, False, False, 
