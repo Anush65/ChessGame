@@ -6,21 +6,11 @@
 #Part one: Set up variables, images and game loop
 import pygame
 
-usernames = [input("Black: "), input("White: ")]
+usernames = ['', '']
 
 pygame.init() 
 num = 8 #Size of the board
-width = 600
-height = 600
-screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-size = width // num
-transposx = 450
-transposy = 100
-pygame.display.set_caption('2 Player Chess') #Title of the window
-font = pygame.font.Font('freesansbold.ttf', 21)
-big_font = pygame.font.Font('freesansbold.ttf', 47)
-timer = pygame.time.Clock()
-fps = 50 #To just determine how smooth your game goes
+
 #game variables and images here
 white_pieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
@@ -41,6 +31,113 @@ captured_pieces_black = []
 turn_step = 0
 selection = 1000
 valid_moves = [] #once a piece is selected, we have to display all valid moves
+
+#dimensions of maximized window
+max_size = (pygame.display.Info().current_w, pygame.display.Info().current_h - 63) #63 is the height of the sidebar @ minimum 
+
+def titlescreen():
+
+    global usernames
+
+    screen = pygame.display.set_mode((960, 540))
+    base_font = pygame.font.Font('freesansbold.ttf', 25)
+    selection = None
+
+    def draw_background():
+        tmp_background = pygame.image.load('C:\\Users\\aadhy\\Desktop\\downloads\\downloads\\images\\Titlescreen2.png')
+        background = pygame.transform.scale(tmp_background, (960, 540))
+        screen.blit(background, (0, 0))
+    
+    input_rect_white = pygame.Rect(966//2, 700//2, 190, 30)
+    input_rect_black = pygame.Rect(966//2, 770//2, 190, 30)
+    boxcolor = ['black', 'black']
+
+    playbutton = pygame.Rect(424, 450, 100, 60)
+
+    pygame.display.set_caption("2 Player Chess")
+    run = True
+    while run:
+        for event in pygame.event.get(): #getting everything that is happening in the computer like click, etc
+            if event.type == pygame.QUIT: #the little X in the top of the window
+                run = False
+
+            #Quit button
+            if event.type == pygame.MOUSEBUTTONUP:
+                if playbutton.collidepoint(event.pos):
+                    run = False
+
+            #selecting box
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_rect_white.collidepoint(event.pos):
+                    selection = 0
+                elif input_rect_black.collidepoint(event.pos):
+                    selection = 1
+                else: selection = None
+
+            #coloring selected box
+            if selection == 0:
+                boxcolor[0] = 'yellow'
+            else: boxcolor[0] = 'black'
+            if selection == 1:
+                boxcolor[1] = 'yellow'
+            else: boxcolor[1] = 'black'
+
+            #entering text
+            if event.type == pygame.KEYDOWN:
+                if selection != None:
+                    if event.key == pygame.K_BACKSPACE:
+                        usernames[selection] = usernames[selection][:-1]
+                    else: 
+                        if text[selection].get_width() < 150:
+                            usernames[selection] += event.unicode
+
+        screen.fill("black")
+        draw_background()
+
+        #input boxes
+        pygame.draw.rect(screen, boxcolor[0], input_rect_white, 2)
+        pygame.draw.rect(screen, boxcolor[1], input_rect_black, 2)
+
+        #rendering inputted text
+        text = [base_font.render(usernames[0], True, 'black'), base_font.render(usernames[1], True, 'black')]
+        screen.blit(text[0], (input_rect_white.x + 4, input_rect_white.y + 4))
+        screen.blit(text[1], (input_rect_black.x + 4, input_rect_black.y + 4))
+
+        #rendering playbutton
+        pygame.draw.rect(screen, 'green', playbutton)
+        pygame.draw.rect(screen, 'black', playbutton, 3)
+        #rendering 'play'
+        screen.blit(base_font.render('Play', True, 'black'), (playbutton.x + 23, playbutton.y + 20))
+
+        input_rect_white.w = max(text[0].get_width() + 12, 100)
+        input_rect_black.w = max(text[1].get_width() + 12, 100)
+
+        pygame.display.flip()
+
+    #accidentally interchanged indices oops (this fixes that)
+    usernames[0], usernames[1] = usernames[1], usernames[0]
+    
+    #default usernames
+    if usernames[0] == '': usernames[0] = 'Black'
+    if usernames[1] == '': usernames[1] = 'White'
+
+    pygame.quit()
+
+titlescreen()
+
+#initialize screen
+pygame.init()
+width = 600
+height = 600
+screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+size = width // num
+transposx = 450
+transposy = 100
+pygame.display.set_caption('2 Player Chess') #Title of the window
+font = pygame.font.Font('freesansbold.ttf', 21)
+big_font = pygame.font.Font('freesansbold.ttf', 47)
+timer = pygame.time.Clock()
+fps = 50 #To just determine how smooth your game goes
 
 #load in game pieces' images (queen, king, rook, knight, pawn, bishop) (each piece 2 times)
 black_queen = pygame.image.load('downloads/images/bQ.png')
@@ -383,22 +480,25 @@ def check_king(position, color):
     if color == 'white':
         enemies_list = black_locations
         friends_list = white_locations
-        if white_moved[white_pieces.index('king')] == False: 
-                #right
-            if 'rightrook' in white_pieces2:
-                if white_moved[white_pieces2.index('rightrook')] == False and (5, 7) not in white_locations and (6, 7) not in white_locations:
-                    moves_list.append((6, 7))
-                #left
-            if 'leftrook' in white_pieces2:
-                if white_moved[white_pieces2.index('leftrook')] == False and (3, 7) not in white_locations and (2, 7) not in white_locations and (1, 7) not in white_locations:
-                    moves_list.append((2, 7))
+            #right        
+        if 'rightrook' in white_pieces2:
+            if white_moved[white_pieces2.index('rightrook')] == False and (5, 7) not in white_locations and (6, 7) not in white_locations:
+                moves_list.append((6, 7))
+            #left
+        if 'leftrook' in white_pieces2:
+            if white_moved[white_pieces2.index('leftrook')] == False and (3, 7) not in white_locations and (2, 7) not in white_locations and (1, 7) not in white_locations:
+                moves_list.append((2, 7))
     else:
         friends_list = black_locations
         enemies_list = white_locations
         if black_moved[black_pieces.index('king')] ==  False:
+                #right
+            
             if 'rightrook' in black_pieces2:
                 if black_moved[black_pieces2.index('rightrook')] == False and (5, 7) not in black_locations and (4,7) not in black_locations and (6,7) not in black_locations:
                     moves_list.append((5, 7))
+                #left
+            
             if 'leftrook' in black_pieces2:
                 if black_moved[black_pieces2.index('leftrook')] == False and (2, 7) not in black_locations and (1, 7) not in black_locations:
                     moves_list.append((1, 7))
@@ -530,9 +630,11 @@ def draw_captured():
         screen.blit(small_white_images[index], (725 + transposx, 5 + 50 * i + transposy))
 
 def draw_game_over():
-    pygame.draw.rect(screen, 'brown', [130 + transposx,250 + transposy,400,50])
-    screen.blit(font.render(f' W {winner} who wins the game!', True, 'orange'), (130 + transposx,250 + transposy))
-    screen.blit(font.render(f'Press ENTER for a new game', True, 'orange'), (140 + transposx,280 + transposy))
+    pygame.draw.rect(screen, 'Black', [130 + transposx,250 + transposy,400,50])
+    if winner == 'White': winner_name = usernames[1]
+    else: winner_name = usernames[0]
+    screen.blit(font.render(f'  {winner_name} wins the game!', True, 'yellow'), (130 + transposx,250 + transposy))
+    screen.blit(font.render(f'  Press ENTER for new game', True, 'yellow'), (130 + transposx,280 + transposy))
 
 #main game loop
 black_options = check_options(black_pieces,black_locations, 'black')
@@ -542,18 +644,18 @@ while run:
     timer.tick(fps)
 
     #check for maximized window
-    info = pygame.display.Info()
+    
     window_size = pygame.display.get_window_size()
 
     maximized = False
 
-    if window_size == (1536, 801): #checks maximized
+    if window_size == max_size: #checks maximized
         transposx, transposy = 450, 100
         maximized = True
     else:
         transposx, transposy = 0, 0
         maximized = False
-    screen.fill('black') #whatever color you want the screen's background to be and the dark squared
+    screen.fill('black') #whatever color you want the screen's background to be 
     draw_board()
     if old != None and new != None:
         draw_prev(old, new)
