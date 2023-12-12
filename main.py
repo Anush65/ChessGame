@@ -44,7 +44,7 @@ def titlescreen():
     selection = None
 
     def draw_background():
-        tmp_background = pygame.image.load('C:\\Users\\aadhy\\Desktop\\downloads\\downloads\\images\\Titlescreen2.png')
+        tmp_background = pygame.image.load('downloads\\images\\Titlescreen2.png')
         background = pygame.transform.scale(tmp_background, (960, 540))
         screen.blit(background, (0, 0))
     
